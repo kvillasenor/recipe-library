@@ -146,5 +146,60 @@ button:hover {
     text-align: center;
     border: 3px solid #A01111;
     border-radius: 8px;
-    margin: 30px auto 0;
+    margin: 10px auto 0;
+}
+
+.dash-container {
+    width: 300px;
+    height: 600px;
+
+    padding: 30px;
+
+    background: rgb(218, 218, 218);
+
+}
+
+.dashboard-page .out{
+    width: 85px;
+    padding: 10px;
+    background-color: #DF4B4B;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+
+    
+    display: block;
+    margin: 0 auto 0;
+    margin-top: 300px;
+}
+
+.dashboard-page button {
+    width: 190px;
+    padding: 10px;
+    background-color: #ffffff;
+    color: #A01111;
+    border: none;
+    border-radius: 15px;
+    border:3px solid #A01111;
+    cursor: pointer;
+    font-size: 18px;
+
+    
+    display: block;
+    margin: 0 auto 0;
+    margin-top: 40px;
+}
+
+.dashboard-page .bread {
+    position: absolute;
+    max-width: 100%;
+
+    width: 200px; 
+    height: 200px; 
+    object-fit: cover;
+
+    margin-top: 450px;
+
 }
