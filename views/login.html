@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+
+    <div class="banner-container">
+        <img src="/images/banner.jpg" alt="Site Banner" class="banner">
+    </div>
+
+    <div class="spiral-wrapper">
+        <img src="/images/spiral.png" alt="Notebook background">
+
+        <div class="container">
+            <form action="/login" method="POST">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Enter Username" required>
+
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter Password" required>
+
+                <button type="submit">Sign In</button>
+            </form>
+
+            <a href="/register">Create Account</a>
+        </div>
+    </div>
+
+</body>

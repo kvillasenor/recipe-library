@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+
+</head>
+<body class="register-page">
+
+    <div class="banner-container">
+        <img src="/images/banner.jpg" alt="Site Banner" class="banner">
+    </div>
+
+    <div class="register-container">
+        <h2>Create Account</h2>
+
+        <form action="/register" method="POST">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter Username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter password" required>
+
+            <label>Re-enter Password</label>
+            <input type="password" name="confirmPassword" placeholder="Re-Enter Password" required>
+
+            <button type="submit">Create Account</button>
+
+            <p>Already have an account? <a class="sign-link" href="/">Sign In</a></p>
+        </form>
+    </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function(e) {
+            const password = document.querySelector('input[name="password"]').value;
+            const confirm = document.querySelector('input[name="confirmPassword"]').value;
+
+            if (password !== confirm) {
+                e.preventDefault();
+                alert("Passwords do not match!");
+            }
+        });
+    </script>
+
+</body>
