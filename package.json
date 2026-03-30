@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/kvillasenor/recipe-library#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mysql2": "^3.20.0"
   }
 }
