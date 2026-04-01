@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 const mysql = require("mysql2");
+const bcrypt = require("bcrypt");
+const { error } = require("console");
 
 const app = express();
 
@@ -39,38 +41,52 @@ app.get("/dashboard", (req, res) => {
 });
 
 // Will handle registration
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
-    const sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    db.query(sql, [username, password], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.send("Error registering user");
-        }
+        const sql = "INSERT INTO users (username, password) VALUES (?, ?)";
 
-        console.log("User registered:", username);
+        db.query(sql, [username, hashedPassword], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.send("Error registering user");
+            }
 
-        // Redirect to login page after success
-        res.redirect("/");
-    });
+            console.log("User registered:", username);
+            res.redirect("/");
+        });
+    } catch(err) {
+        console.error(error);
+        res.send("Error hashing password");
+    }
+    
 });
 
 
 //Handles login
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    const sql = "SELECT * FROM users WHERE username = ?";
 
-    db.query(sql, [username, password], (err, results) => {
+    db.query(sql, [username], async (err, results) => {
         if (err) {
             console.error(err);
             return res.send("Error logging in");
         }
 
-        if (results.length > 0) {
+        if (results.length == 0) {
+            return res.send("Invalid username or password");
+        }
+
+        const user = results[0];
+
+        const match = await bcrypt.compare(password, user.password);
+
+        if (match) {
             //Successful login
             res.redirect("/dashboard");
         } else {
