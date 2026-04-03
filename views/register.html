@@ -19,6 +19,8 @@
     <div class="register-container">
         <h2>Create Account</h2>
 
+        <p id="error-message" style="color: red; text-align: center;"></p>
+
         <form action="/register" method="POST">
             <label>Username</label>
             <input type="text" name="username" placeholder="Enter Username" required>
@@ -45,6 +47,13 @@
                 alert("Passwords do not match!");
             }
         });
+
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get("error");
+
+        if (error) {
+            document.getElementById("error-message").textContent = error;
+        }
     </script>
 
 </body>

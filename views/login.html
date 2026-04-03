@@ -19,6 +19,8 @@
         <img src="/images/spiral.png" alt="Notebook background">
 
         <div class="container">
+            <p id="error-message" style="color: red; text-align: center;"></p>
+
             <form action="/login" method="POST">
                 <label>Username</label>
                 <input type="text" name="username" placeholder="Enter Username" required>
@@ -34,4 +36,13 @@
         </div>
     </div>
 
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get("error");
+
+        if (error) {
+            document.getElementById("error-message").textContent = error;
+        }
+    </script>
 </body>

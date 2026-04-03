@@ -55,7 +55,7 @@ app.post("/register", async (req, res) => {
 
         // this is if the username exists
         if (results.length > 0) {
-            return res.send("Username already exists");
+            return res.redirect("/register?error=Username already exists");
         }
 
         try {
@@ -91,11 +91,11 @@ app.post("/login", async (req, res) => {
     db.query(sql, [username], async (err, results) => {
         if (err) {
             console.error(err);
-            return res.send("Error logging in");
+            return res.redirect("/?error=Srever error");
         }
 
         if (results.length == 0) {
-            return res.send("Invalid username or password");
+            return res.redirect("/?error=Invalid username or password");
         }
 
         const user = results[0];
@@ -107,7 +107,7 @@ app.post("/login", async (req, res) => {
             res.redirect("/dashboard");
         } else {
             //Invalid login
-            res.send("Invalid username or password");
+            return res.redirect("/?error=Invalid username or password");
         }
     });
 });
