@@ -44,25 +44,41 @@ app.get("/dashboard", (req, res) => {
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
+    // checks to see if username already exists
+    const checkUser = "SELECT * FROM users WHERE username = ?";
 
-        const sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+    db.query(checkUser, [username], async (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.send("Error checking user");
+        }
 
-        db.query(sql, [username, hashedPassword], (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.send("Error registering user");
-            }
+        // this is if the username exists
+        if (results.length > 0) {
+            return res.send("Username already exists");
+        }
 
-            console.log("User registered:", username);
-            res.redirect("/");
-        });
-    } catch(err) {
-        console.error(error);
-        res.send("Error hashing password");
-    }
-    
+        try {
+            //hashes the password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+
+            db.query(sql, [username, hashedPassword], (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return res.send("Error registering user");
+                }
+
+                console.log("User registered:", username);
+                res.redirect("/");
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.send("Error hashing password");
+        }
+    });
 });
 
 
