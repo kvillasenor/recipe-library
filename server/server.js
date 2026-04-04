@@ -112,6 +112,10 @@ app.post("/login", async (req, res) => {
     });
 });
 
+app.get("/add-recipe", (req, res) => {
+    res.sendFile(path.join(__dirname, "../views/add-recipe.html"));
+});
+
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });

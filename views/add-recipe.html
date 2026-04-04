@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Recipe</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="add-recipe-page">
+
+    <div class="banner-container">
+        <img src="/images/banner.jpg" alt="Banner">
+    </div>
+
+    <div class="top-section">
+        <input type="text" name="title" placeholder="Recipe Title" class="title-input">
+
+        <div class="button-group">
+            <button type="submit" class="save-btn">Save Recipe</button>
+            <a href="/dashboard" class="cancel-btn">Cancel</a>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <form action="/add-recipe" method="POST">
+
+        <div class="main-layout">
+
+            <!-- LEFT SIDE -->
+            <div class="left-panel">
+                <label>Course Type:</label>
+                <select name="course">
+                    <option>SELECT</option>
+                    <option>Breakfast</option>
+                    <option>Lunch</option>
+                    <option>Dinner</option>
+                    <option>Dessert</option>
+                </select>
+
+                <label>Category:</label>
+                <select name="category">
+                    <option>SELECT</option>
+                </select>
+
+                <button type="button" class="small-btn">Create New Category</button>
+
+                <label>Preparation Time:</label>
+                <div class="time-group">
+                    <input type="number" placeholder="Hrs">
+                    <input type="number" placeholder="Mins">
+                </div>
+
+                <label>Cooking Time:</label>
+                <div class="time-group">
+                    <input type="number" placeholder="Hrs">
+                    <input type="number" placeholder="Mins">
+                </div>
+            </div>
+
+            <!-- CENTER -->
+            <div class="center-panel">
+                <label>Ingredients</label>
+                <textarea name="ingredients"></textarea>
+
+                <label>Instructions</label>
+                <textarea name="instructions"></textarea>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="right-panel">
+                <label>Upload Image:</label>
+                <input type="file" name="image">
+            </div>
+
+        </div>
+    </form>
+
+</body>
+</html>

@@ -203,3 +203,114 @@ button:hover {
     margin-top: 450px;
 
 }
+
+/* Top section */
+.top-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 20px;
+}
+
+.title-input {
+    width: 400px;
+    padding: 15px;
+    font-size: 24px;
+    text-align: center;
+    border: 3px solid #ccc;
+    border-radius: 5px;
+}
+
+
+
+/* Main layout */
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 30px;
+    padding: 30px;
+}
+
+/* Panels */
+.left-panel, .center-panel, .right-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Textareas */
+.center-panel textarea {
+    height: 120px;
+    margin-bottom: 20px;
+    border: 3px solid #ccc;
+}
+
+/* Time inputs */
+.time-group {
+    display: flex;
+    gap: 10px;
+    
+}
+
+.time-group input {
+    width: 60px;
+}
+
+/* Small button */
+.small-btn {
+    background-color: #DF4B4B;
+    color: white;
+    border: none;
+    padding: 4px;
+    margin: 10px 80px;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Right panel */
+.right-panel input {
+    margin-top: 10px;
+}
+
+.button-group {
+    position: absolute;
+    right: 50px;
+    display: flex;
+    gap: 10px;
+}
+
+/* Save button */
+.save-btn {
+    background-color: #DF4B4B;
+    color: white;
+    padding: 10px 10px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* Cancel button */
+.cancel-btn {
+    background-color: #ccc;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Hover effects */
+.save-btn:hover {
+    background-color: #c93e3e;
+}
+
+.cancel-btn:hover {
+    background-color: #b3b3b3;
+}
