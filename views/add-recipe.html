@@ -12,29 +12,30 @@
         <img src="/images/banner.jpg" alt="Banner">
     </div>
 
-    <div class="top-section">
-        <input type="text" name="title" placeholder="Recipe Title" class="title-input">
-
-        <div class="button-group">
-            <button type="submit" class="save-btn">Save Recipe</button>
-            <a href="/dashboard" class="cancel-btn">Cancel</a>
-        </div>
-    </div>
 
     <!-- Main Layout -->
     <form action="/add-recipe" method="POST">
+
+        <div class="top-section">
+            <input type="text" name="title" placeholder="Recipe Title" class="title-input" required>
+            
+            <div class="button-group">
+                <button type="submit" class="save-btn">Save Recipe</button>
+                <a href="/dashboard" class="cancel-btn">Cancel</a>
+            </div>
+        </div>
 
         <div class="main-layout">
 
             <!-- LEFT SIDE -->
             <div class="left-panel">
                 <label>Course Type:</label>
-                <select name="course">
-                    <option>SELECT</option>
-                    <option>Breakfast</option>
-                    <option>Lunch</option>
-                    <option>Dinner</option>
-                    <option>Dessert</option>
+                <select name="course" required>
+                    <option value="">SELECT</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Dessert">Dessert</option>
                 </select>
 
                 <label>Category:</label>
@@ -46,24 +47,24 @@
 
                 <label>Preparation Time:</label>
                 <div class="time-group">
-                    <input type="number" placeholder="Hrs">
-                    <input type="number" placeholder="Mins">
+                    <input type="number" name="prep_hours" placeholder="Hrs">
+                    <input type="number" name="prep_minutes" placeholder="Mins">
                 </div>
 
                 <label>Cooking Time:</label>
                 <div class="time-group">
-                    <input type="number" placeholder="Hrs">
-                    <input type="number" placeholder="Mins">
+                    <input type="number" name="cook_hours" placeholder="Hrs">
+                    <input type="number" name="cook_minutes" placeholder="Mins">
                 </div>
             </div>
 
             <!-- CENTER -->
             <div class="center-panel">
                 <label>Ingredients</label>
-                <textarea name="ingredients"></textarea>
+                <textarea name="ingredients" required></textarea>
 
                 <label>Instructions</label>
-                <textarea name="instructions"></textarea>
+                <textarea name="instructions" required></textarea>
             </div>
 
             <!-- RIGHT -->
@@ -73,6 +74,7 @@
             </div>
 
         </div>
+
     </form>
 
 </body>
