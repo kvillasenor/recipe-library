@@ -3,6 +3,8 @@ const path = require("path");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const multer = require("multer");
+const fs = require("fs");
 
 const app = express();
 
@@ -32,6 +34,18 @@ db.connect((err) => {
         console.log("Connected to MySQL!");
     }
 });
+
+//Configuring storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "public/uploads");
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
 
 //Routes
 app.get("/", (req, res) => {
@@ -123,9 +137,10 @@ app.post("/login", async (req, res) => {
     });
 });
 
-app.post("/add-recipe", (req, res) => {
+app.post("/add-recipe", upload.single("image"), (req, res) => {
 
     console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
 
     if (!req.session.user_id) {
         return res.redirect("/");
@@ -143,13 +158,19 @@ app.post("/add-recipe", (req, res) => {
         category
     } = req.body;
 
+    if (!title || !ingredients || !instructions) {
+        return res.send("Missing required fields");
+    }
+    
+    const image = req.file ? "/uploads/" + req.file.filename : null;
+
     const prep_time = `${prep_hours || 0}h ${prep_minutes || 0}m`;
     const cook_time = `${cook_hours || 0}h ${cook_minutes || 0}m`;
 
     const sql = `
         INSERT INTO recipes 
-        (user_id, title, ingredients, instructions, prep_time, cook_time, course, category)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (user_id, title, ingredients, instructions, prep_time, cook_time, course, category, image)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql, [
@@ -160,11 +181,12 @@ app.post("/add-recipe", (req, res) => {
         prep_time,
         cook_time,
         course,
-        category
+        category,
+        image
     ], (err, result) => {
         if (err) {
            console.log("MYSQL ERROR:", err);
-            return res.send(err.sqlMessage || err.message);
+            return res.send("Error saving recipe");
         }
 
         res.redirect("/dashboard");

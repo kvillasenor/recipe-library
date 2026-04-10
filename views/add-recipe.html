@@ -12,9 +12,8 @@
         <img src="/images/banner.jpg" alt="Banner">
     </div>
 
-
     <!-- Main Layout -->
-    <form action="/add-recipe" method="POST">
+    <form action="/add-recipe" method="POST" enctype="multipart/form-data">
 
         <div class="top-section">
             <input type="text" name="title" placeholder="Recipe Title" class="title-input" required>
@@ -69,7 +68,7 @@
 
             <!-- RIGHT -->
             <div class="right-panel">
-                <label>Upload Image:</label>
+                <label>Upload Image (JPG or PNG):</label>
                 <input type="file" name="image">
             </div>
 
