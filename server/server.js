@@ -64,6 +64,28 @@ app.get("/add-recipe", (req, res) => {
     res.sendFile(path.join(__dirname, "../views/add-recipe.html"));
 });
 
+app.get("/recipes", (req, res) => {
+    // Make sure user is logged in
+    if (!req.session.user_id) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const sql = `
+        SELECT *
+        FROM recipes
+        WHERE user_id = ?
+    `;
+
+    db.query(sql, [req.session.user_id], (err, results) => {
+        if (err) {
+            console.error("Error fetching recipes:", err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        res.json(results);
+    });
+});
+
 // Will handle registration
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;

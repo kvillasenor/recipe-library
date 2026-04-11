@@ -44,13 +44,54 @@
             <!-- CONTENT AREA -->
             <div class="content-box">
 
-                <h2 class="empty-text">“No Saved Recipes Yet”</h2>
+                <h2 id="emptyMessage" class="empty-text">“No Saved Recipes Yet”</h2>
+
+                <div id="recipeGrid"></div>
 
             </div>
 
         </div>
 
     </div>
+
+    <script>
+        window.onload = function () {
+            fetch("/recipes")
+            .then(res => res.json())
+            .then(data => {
+                console.log("Recipes:", data);
+                displayRecipes(data);
+            })
+            .catch(err => console.error(err));
+        };
+
+        function displayRecipes(recipes) {
+            const container = document.getElementById("recipeGrid");
+            const emptyMessage = document.getElementById("emptyMessage");
+
+            container.innerHTML = "";
+
+            if (!Array.isArray(recipes) || recipes.length === 0) {
+                emptyMessage.style.display = "block";
+                return;
+            }
+
+            emptyMessage.style.display = "none";
+
+            recipes.forEach(recipe => {
+                const card = document.createElement("div");
+                card.classList.add("recipe-card");
+
+                card.innerHTML = `
+                    <img src="${recipe.image || '/images/default.png'}" class="recipe-img">
+                    <div class="recipe-title">${recipe.title}</div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+    </script>
 
 </body>
             
