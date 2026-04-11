@@ -76,7 +76,7 @@ button {
 
     
     display: block;
-    margin: 0 auto 0;
+    margin: 0;
 }
 
 button:hover {
@@ -97,6 +97,10 @@ button:hover {
 
 .login-page a:hover {
     background-color: #fb8c8c;
+}
+
+.login-page button {
+    margin: 20px auto;
 }
 
 .register-page .register-container {
@@ -314,3 +318,121 @@ button:hover {
 .cancel-btn:hover {
     background-color: #b3b3b3;
 }
+
+/* DASHBOARD LAYOUT */
+.dashboard-wrapper {
+    display: flex;
+    height: calc(100vh - 150px);
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 300px;
+    height: flex;
+    background: #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+/* SEARCH BAR */
+.search-bar {
+    padding: 10px;
+    border: 2px solid #A01111;
+    border-radius: 20px;
+}
+
+/* SIDEBAR BUTTONS */
+.sidebar-btn {
+    padding: 10px;
+    background: white;
+    border: 2px solid #A01111;
+    border-radius: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    color: #A01111;
+}
+
+/* SIGN OUT */
+.signout-btn {
+    margin-top: auto;
+    background: #DF4B4B;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 20px;
+    text-decoration: none;
+}
+
+.sidebar-image {
+    width: 140px;
+    margin-top: auto;
+    align-self: center;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* TABS */
+.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: -5px;
+}
+
+.tab {
+    padding: 12px 25px;
+
+    border-radius: 10px 10px 0 0;
+    border: none;
+    background: #bfbfbf;
+    color: #A01111;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: Comfortaa, sans-serif;
+
+    margin: 0;
+}
+
+.tabs .tab {
+    width: auto !important;        
+    margin: 0 !important;        
+    display: inline-block;  
+}
+
+.tab + .tab {
+    margin-left: -2px; 
+}
+
+.tab.active {
+    background: white;
+    color: #A01111;
+
+
+}
+
+.tab:hover {
+    background: #d6d6d6;
+}
+
+.content-box {
+    background: white;
+    border: 6px solid black;
+    border-radius: 20px;
+    height: 70vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* EMPTY TEXT */
+.empty-text {
+    font-size: 24px;
+    color: #333;
+}
+

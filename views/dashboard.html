@@ -16,13 +16,40 @@
         <img src="/images/banner.jpg" alt="Site Banner" class="banner">
     </div>
 
-    <div class="bread">
-        <img src="/images/breadS.png" alt="Site Banner" class="banner">
-    </div>
-    <div class="dash-container">
-        <a href="/add-recipe" class="add">➕ Add New Recipe</a>
-        <a href="/" class="out">Sign Out</a>
-        
+    <!-- MAIN WRAPPER -->
+    <div class="dashboard-wrapper">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+
+            <input type="text" placeholder="Search Recipe" class="search-bar">
+
+            <a href="/add-recipe" class="sidebar-btn">➕ Add New Recipe</a>
+
+            <a href="/" class="signout-btn">Sign Out</a>
+
+            <img src="/images/breadS.png" class="sidebar-image">
+
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab active">VIEW ALL</button>
+                <button class="tab">COURSES</button>
+            </div>
+
+            <!-- CONTENT AREA -->
+            <div class="content-box">
+
+                <h2 class="empty-text">“No Saved Recipes Yet”</h2>
+
+            </div>
+
+        </div>
+
     </div>
 
 </body>
