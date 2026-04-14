@@ -55,6 +55,12 @@
     </div>
 
     <script>
+
+        function getImage(recipe) {
+            if (!recipe.image) return '/images/default.png';
+            return recipe.image;
+        }
+        
         let allRecipes = [];
 
         const courseData = [
@@ -91,7 +97,7 @@
                 card.classList.add("recipe-card");
 
                 card.innerHTML = `
-                    <img src="${recipe.image || '/images/default.png'}" class="recipe-img">
+                    <img src="${getImage(recipe)}" class="recipe-img">
                     <div class="recipe-title">${recipe.title}</div>
                 `;
 
@@ -108,6 +114,20 @@
                 }
 
                 groups[course].push(recipe);
+
+                return groups;
+            }, {});
+        }
+
+        function groupByCategory(recipes) {
+            return recipes.reduce((groups, recipe) => {
+                const category = recipe.category || "Uncategorized";
+
+                if (!groups[category]) {
+                    groups[category] = [];
+                }
+
+                groups[category].push(recipe);
 
                 return groups;
             }, {});
@@ -148,7 +168,7 @@
                     card.classList.add("recipe-card");
 
                     card.innerHTML = `
-                        <img src="${recipe.image || '/images/default.png'}" class="recipe-img">
+                        <img src="${getImage(recipe)}" class="recipe-img">
                         <div class="recipe-title">${recipe.title}</div>
                     `;
 
@@ -175,14 +195,15 @@
                 `;
 
                 card.onclick = function () {
-                    showRecipesByCourse(course.name);
+                    showCategories(course.name);
                 };
 
                 container.appendChild(card);
             });
         }
 
-        function showRecipesByCourse(courseName) {
+
+        function showCategories(courseName) {
             const container = document.getElementById("recipeGrid");
             const emptyMessage = document.getElementById("emptyMessage");
 
@@ -198,12 +219,48 @@
 
             emptyMessage.style.display = "none";
 
+            const grouped = groupByCategory(filtered);
+
+            Object.keys(grouped).forEach(category => {
+                const card = document.createElement("div");
+                card.classList.add("course-image-card");
+
+                card.innerHTML = `
+                    <img src="/images/customFolder.png" class="course-img">
+                    <div class="category-label">${category}</div>
+                `;
+
+                card.onclick = function () {
+                    showRecipesByCategory(courseName, category);
+                };
+
+                container.appendChild(card);
+            });
+        }
+
+        function showRecipesByCategory(courseName, categoryName) {
+            const container = document.getElementById("recipeGrid");
+            const emptyMessage = document.getElementById("emptyMessage");
+
+            container.innerHTML = "";
+
+            const filtered = allRecipes.filter(r =>
+                r.course === courseName && r.category === categoryName
+            );
+
+            if (filtered.length === 0) {
+                emptyMessage.style.display = "block";
+                return;
+            }
+
+            emptyMessage.style.display = "none";
+
             filtered.forEach(recipe => {
                 const card = document.createElement("div");
                 card.classList.add("recipe-card");
 
                 card.innerHTML = `
-                    <img src="${recipe.image || '/images/default.png'}" class="recipe-img">
+                    <img src="${getImage(recipe)}" class="recipe-img">
                     <div class="recipe-title">${recipe.title}</div>
                 `;
 
