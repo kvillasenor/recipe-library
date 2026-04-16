@@ -42,7 +42,9 @@
                     <option>SELECT</option>
                 </select>
 
-                <button type="button" class="small-btn">Create New Category</button>
+                <button type="button" class="small-btn" onclick="createCategory()">
+                    Create New Category
+                </button>
 
                 <label>Preparation Time:</label>
                 <div class="time-group">
@@ -75,6 +77,48 @@
         </div>
 
     </form>
+<script>
 
+    window.onload = function () {
+        loadCategories();
+    };
+
+    function loadCategories() {
+        fetch("/categories")
+            .then(res => res.json())
+            .then(data => {
+                const dropdown = document.querySelector("select[name='category']");
+
+                // Reset dropdown
+                dropdown.innerHTML = '<option>SELECT</option>';
+
+                data.forEach(cat => {
+                    const option = document.createElement("option");
+                    option.value = cat.name;
+                    option.textContent = cat.name;
+                    dropdown.appendChild(option);
+                });
+            });
+    }
+
+    function createCategory() {
+        const name = prompt("Enter new category name:");
+
+        if (!name || name.trim() === "") return;
+
+        fetch("/categories", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name })
+        })
+        .then(res => res.json())
+        .then(() => {
+            loadCategories(); // refresh dropdown
+        })
+        .catch(err => console.error(err));
+    }
+</script>
 </body>
 </html>

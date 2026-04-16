@@ -86,6 +86,23 @@ app.get("/recipes", (req, res) => {
     });
 });
 
+app.get("/categories", (req, res) => {
+    if (!req.session.user_id) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const sql = "SELECT * FROM categories WHERE user_id = ?";
+
+    db.query(sql, [req.session.user_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        res.json(results);
+    });
+});
+
 // Will handle registration
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
@@ -215,6 +232,25 @@ app.post("/add-recipe", upload.single("image"), (req, res) => {
     });
 });
 
+
+app.post("/categories", (req, res) => {
+    if (!req.session.user_id) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const { name } = req.body;
+
+    const sql = "INSERT INTO categories (name, user_id) VALUES (?, ?)";
+
+    db.query(sql, [name, req.session.user_id], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        res.json({ success: true });
+    });
+});
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
