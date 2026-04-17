@@ -646,18 +646,25 @@ button:hover {
 /* TITLE BOX (grey rectangle) */
 .title-box {
   background: #e6e6e6;
-  padding: 15px;
+  padding: 6px 15px;
   border-radius: 10px;
-  width: 60%;
-  margin: 20px auto;
+  width: 57%;
+  margin: 15px auto;
   text-align: center;
+  
+}
+
+.title-box h1 {
+  margin: 5px 0;
 }
 
 .meta {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  font-weight: bold;
+    display: flex;
+    justify-content: center;
+    gap: 160px;
+    font-weight: bold;
+    margin-top: 5px;
+
 }
 
 /* CONTENT AREA */
@@ -683,4 +690,11 @@ button:hover {
 /* INSTRUCTIONS */
 #instructions {
   white-space: pre-line;
+}
+
+#title {
+  font-family: "Corben", serif;
+  color: #A01111;
+  font-size: 50px;
+  font-weight: 250;
 }
