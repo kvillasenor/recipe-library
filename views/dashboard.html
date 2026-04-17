@@ -101,6 +101,10 @@
                     <div class="recipe-title">${recipe.title}</div>
                 `;
 
+                card.onclick = function () {
+                    window.location.href = `/recipe/${recipe.id}`;
+                };
+
                 container.appendChild(card);
             });
         }
@@ -171,6 +175,10 @@
                         <img src="${getImage(recipe)}" class="recipe-img">
                         <div class="recipe-title">${recipe.title}</div>
                     `;
+
+                    card.onclick = function () {
+                        window.location.href = `/recipe/${recipe.id}`;
+                    };
 
                     grid.appendChild(card);
                 });
@@ -263,6 +271,10 @@
                     <img src="${getImage(recipe)}" class="recipe-img">
                     <div class="recipe-title">${recipe.title}</div>
                 `;
+
+                card.onclick = function () {
+                    window.location.href = `/recipe/${recipe.id}`;
+                };
 
                 container.appendChild(card);
             });

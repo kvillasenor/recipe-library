@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe</title>
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+</head>
+
+<body class="recipe-page">
+
+    <div class="banner-container">
+        <img src="/images/banner.jpg" alt="Site Banner" class="banner">
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+
+    <a href="/dashboard" class="back-btn">← Go Back</a>
+
+    <div class="tags">
+        <span class="pill" id="course"></span>
+        <span class="pill" id="category"></span>
+    </div>
+
+    <div class="actions">
+        <button id="editBtn">Edit</button>
+        <button id="deleteBtn">Delete</button>
+    </div>
+
+    </div>
+
+    <!-- TITLE BOX -->
+    <div class="title-box">
+    <h1 id="title"></h1>
+
+    <div class="meta">
+        <span>Prep Time: <span id="prep"></span></span>
+        <span>Cook Time: <span id="cook"></span></span>
+    </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+    <div class="section">
+        <h2>Ingredients</h2>
+        <ul id="ingredients"></ul>
+    </div>
+
+    <div class="section">
+        <h2>Instructions</h2>
+        <p id="instructions"></p>
+    </div>
+
+    </div>
+
+  <!-- SCRIPT -->
+  <script>
+    async function loadRecipe() {
+      const id = window.location.pathname.split("/").pop();
+
+      const res = await fetch(`/recipes/${id}`, {
+        credentials: "include"
+      });
+
+      if (!res.ok) {
+        document.body.innerHTML = "<h2>Recipe not found or not logged in</h2>";
+        return;
+      }
+
+      const recipe = await res.json();
+
+      document.getElementById("title").textContent = recipe.title;
+      document.getElementById("prep").textContent = recipe.prep_time;
+      document.getElementById("cook").textContent = recipe.cook_time;
+      document.getElementById("course").textContent = recipe.course;
+      document.getElementById("category").textContent = recipe.category;
+
+      // INGREDIENTS (convert lines into bullets)
+      const ingredients = recipe.ingredients.split("\n");
+      document.getElementById("ingredients").innerHTML =
+        ingredients.map(i => `<li>${i}</li>`).join("");
+
+      // INSTRUCTIONS
+      document.getElementById("instructions").textContent = recipe.instructions;
+    }
+
+    loadRecipe();
+  </script>
+
+</body>
+</html>

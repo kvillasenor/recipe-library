@@ -86,6 +86,31 @@ app.get("/recipes", (req, res) => {
     });
 });
 
+app.get("/recipe/:id", (req, res) => {
+    res.sendFile(path.join(__dirname, "../views/recipe.html"));
+});
+
+app.get("/recipes/:id", (req, res) => {
+    if (!req.session.user_id) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+
+    const sql = "SELECT * FROM recipes WHERE id = ? AND user_id = ?";
+
+    db.query(sql, [req.params.id, req.session.user_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Recipe not found" });
+        }
+
+        res.json(results[0]);
+    });
+});
+
 app.get("/categories", (req, res) => {
     if (!req.session.user_id) {
         return res.status(401).json({ error: "Not logged in" });

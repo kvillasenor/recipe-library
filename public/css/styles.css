@@ -554,14 +554,6 @@ button:hover {
     object-fit: contain;
 }
 
-.recipe-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 15px;
-    overflow: hidden;
-}
-
 .recipe-img {
     width: 100%;
     height: 160px;
@@ -576,4 +568,119 @@ button:hover {
     font-weight: bold;
     color: #000;
     text-align: center;
+}
+
+
+.recipe-header {
+  text-align: center;
+  margin: 20px 0;
+}
+
+
+
+.tags {
+  margin-top: 10px;
+}
+
+
+
+.actions {
+  margin-top: 10px;
+}
+
+.recipe-image {
+  width: 200px;
+  display: block;
+  margin: 0 auto 20px;
+}
+
+.recipe-page .content {
+  border: 3px dashed #e55;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+
+/* ===== RECIPE PAGE ONLY ===== */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+  padding: 10px 20px;
+  
+}
+
+.back-btn {
+  text-decoration: none;
+  color: red;
+  font-weight: bold;
+}
+
+.tag-group {
+  display: flex;
+  gap: 10px;
+  
+}
+
+.actions {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.pill {
+  background: #f3a6a6;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+/* TITLE BOX (grey rectangle) */
+.title-box {
+  background: #e6e6e6;
+  padding: 15px;
+  border-radius: 10px;
+  width: 60%;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.meta {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-weight: bold;
+}
+
+/* CONTENT AREA */
+.content {
+  width: 55%;
+  margin: auto;
+  text-align: left;
+}
+
+.section {
+  margin-top: 20px;
+}
+
+.section h2 {
+  color: #b30000;
+}
+
+/* INGREDIENTS */
+#ingredients {
+  padding-left: 20px;
+}
+
+/* INSTRUCTIONS */
+#instructions {
+  white-space: pre-line;
 }
