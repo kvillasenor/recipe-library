@@ -22,7 +22,7 @@
         <!-- SIDEBAR -->
         <div class="sidebar">
 
-            <input type="text" placeholder="Search Recipe" class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search Recipe" class="search-bar">
 
             <a href="/add-recipe" class="sidebar-btn">➕ Add New Recipe</a>
 
@@ -62,6 +62,32 @@
         }
         
         let allRecipes = [];
+
+        const searchInput = document.getElementById("searchInput");
+
+        searchInput.addEventListener("input", function () {
+            const query = this.value.toLowerCase().trim();
+
+            showAll();
+
+            // If search is empty → show all recipes again
+            if (query === "") {
+                displayAllRecipes(allRecipes);
+                return;
+            }
+
+            // Filter recipes
+            const filtered = allRecipes.filter(recipe => {
+                return (
+                    recipe.title?.toLowerCase().includes(query) ||
+                    recipe.ingredients?.toLowerCase().includes(query) ||
+                    recipe.course?.toLowerCase().includes(query) ||
+                    recipe.category?.toLowerCase().includes(query)
+                );
+            });
+
+            displayAllRecipes(filtered);
+        });
 
         const courseData = [
             { name: "Breakfast", image: "/images/breakfastFolder.png" },
