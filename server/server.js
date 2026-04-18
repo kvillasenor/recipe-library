@@ -128,6 +128,10 @@ app.get("/categories", (req, res) => {
     });
 });
 
+app.get("/edit-recipe/:id", (req, res) => {
+    res.sendFile(path.join(__dirname, "../views/edit-recipe.html"));
+});
+
 // Will handle registration
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;

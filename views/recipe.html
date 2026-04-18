@@ -91,6 +91,11 @@
       document.getElementById("instructions").textContent = recipe.instructions;
     }
 
+    document.getElementById("editBtn").addEventListener("click", function () {
+        const id = window.location.pathname.split("/").pop();
+        window.location.href = `/edit-recipe/${id}`;
+    });
+
     loadRecipe();
   </script>
 
