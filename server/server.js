@@ -261,6 +261,91 @@ app.post("/add-recipe", upload.single("image"), (req, res) => {
     });
 });
 
+app.post("/update-recipe/:id", upload.single("image"), (req, res) => {
+
+    console.log("UPDATE BODY:", req.body);
+    console.log("UPDATE FILE:", req.file);
+
+    if (!req.session.user_id) {
+        return res.status(401).send("Not logged in");
+    }
+
+    const id = req.params.id;
+
+    const {
+        title,
+        ingredients,
+        instructions,
+        prep_hours,
+        prep_minutes,
+        cook_hours,
+        cook_minutes,
+        course,
+        category
+    } = req.body;
+
+    const prep_time = `${prep_hours || 0}h ${prep_minutes || 0}m`;
+    const cook_time = `${cook_hours || 0}h ${cook_minutes || 0}m`;
+
+    let imagePath = null;
+
+    if (req.file) {
+        imagePath = "/uploads/" + req.file.filename;
+    }
+
+    let sql;
+    let params;
+
+    if (imagePath) {
+        sql = `
+            UPDATE recipes
+            SET title = ?, ingredients = ?, instructions = ?, 
+                prep_time = ?, cook_time = ?, course = ?, category = ?, image = ?
+            WHERE id = ? AND user_id = ?
+        `;
+
+        params = [
+            title,
+            ingredients,
+            instructions,
+            prep_time,
+            cook_time,
+            course,
+            category,
+            imagePath,
+            id,
+            req.session.user_id
+        ];
+    } else {
+        sql = `
+            UPDATE recipes
+            SET title = ?, ingredients = ?, instructions = ?, 
+                prep_time = ?, cook_time = ?, course = ?, category = ?
+            WHERE id = ? AND user_id = ?
+        `;
+
+        params = [
+            title,
+            ingredients,
+            instructions,
+            prep_time,
+            cook_time,
+            course,
+            category,
+            id,
+            req.session.user_id
+        ];
+    }
+
+    db.query(sql, params, (err) => {
+        if (err) {
+            console.error("UPDATE ERROR:", err);
+            return res.status(500).send("Database error");
+        }
+
+        res.sendStatus(200);
+    });
+});
 
 app.post("/categories", (req, res) => {
     if (!req.session.user_id) {

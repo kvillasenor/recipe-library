@@ -13,7 +13,7 @@
 </div>
 
 <!-- Main Layout -->
-<form id="editForm">
+<form id="editForm" enctype="multipart/form-data">
 
     <div class="top-section">
         <input type="text" id="title" class="title-input" required>
@@ -39,7 +39,7 @@
 
             <label>Category:</label>
             <select id="category">
-                <option>SELECT</option>
+                <option value="">SELECT</option>
             </select>
 
             <button type="button" class="small-btn" onclick="createCategory()">
@@ -70,7 +70,8 @@
 
         <!-- RIGHT -->
         <div class="right-panel">
-            <label>Image cannot be changed yet</label>
+            <label>Upload New Image (optional):</label>
+            <input type="file" id="image" accept="image/png, image/jpeg">
         </div>
 
     </div>
@@ -79,6 +80,26 @@
 
 <script>
 let recipeId = null;
+
+async function loadCategories(selectedCategory) {
+    const res = await fetch("/categories");
+    const data = await res.json();
+
+    const dropdown = document.getElementById("category");
+    dropdown.innerHTML = '<option value="">SELECT</option>';
+
+    data.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat.name;
+        option.textContent = cat.name;
+
+        if (cat.name === selectedCategory) {
+            option.selected = true;
+        }
+
+        dropdown.appendChild(option);
+    });
+}
 
 async function loadRecipe() {
     recipeId = window.location.pathname.split("/").pop();
@@ -98,10 +119,10 @@ async function loadRecipe() {
     document.getElementById("ingredients").value = recipe.ingredients;
     document.getElementById("instructions").value = recipe.instructions;
     document.getElementById("course").value = recipe.course;
-    document.getElementById("category").value = recipe.category;
+    loadCategories(recipe.category);
 
-    const prep = recipe.prep_time.match(/\d+/g);
-    const cook = recipe.cook_time.match(/\d+/g);
+    const prep = recipe.prep_time ? recipe.prep_time.match(/\d+/g) : null;
+    const cook = recipe.cook_time ? recipe.cook_time.match(/\d+/g) : null;
 
     document.getElementById("prep_hours").value = prep ? prep[0] : "";
     document.getElementById("prep_minutes").value = prep ? prep[1] : "";
@@ -109,7 +130,61 @@ async function loadRecipe() {
     document.getElementById("cook_minutes").value = cook ? cook[1] : "";
 }
 
+function createCategory() {
+    const name = prompt("Enter new category name:");
+
+    if (!name || name.trim() === "") return;
+
+    fetch("/categories", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name })
+    })
+    .then(() => loadCategories(name))
+    .catch(err => console.error(err));
+}
+
+
+document.getElementById("editForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const id = window.location.pathname.split("/").pop();
+
+    const formData = new FormData();
+
+    formData.append("title", document.getElementById("title").value);
+    formData.append("ingredients", document.getElementById("ingredients").value);
+    formData.append("instructions", document.getElementById("instructions").value);
+    formData.append("prep_hours", document.getElementById("prep_hours").value);
+    formData.append("prep_minutes", document.getElementById("prep_minutes").value);
+    formData.append("cook_hours", document.getElementById("cook_hours").value);
+    formData.append("cook_minutes", document.getElementById("cook_minutes").value);
+    formData.append("course", document.getElementById("course").value);
+    formData.append("category", document.getElementById("category").value);
+
+    const imageFile = document.getElementById("image").files[0];
+    if (imageFile) {
+        formData.append("image", imageFile);
+    }
+
+    const res = await fetch(`/update-recipe/${id}`, {
+        method: "POST",
+        body: formData
+    });
+
+    if (res.ok) {
+        window.location.href = "/dashboard";
+    } else {
+        alert("Error updating recipe");
+    }
+});
+
 loadRecipe();
+
+
+
 </script>
 
 </body>
