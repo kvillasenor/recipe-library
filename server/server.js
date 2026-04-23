@@ -347,6 +347,25 @@ app.post("/update-recipe/:id", upload.single("image"), (req, res) => {
     });
 });
 
+app.post("/delete-recipe/:id", (req, res) => {
+    if (!req.session.user_id) {
+        return res.status(401).send("Not logged in");
+    }
+
+    const id = req.params.id;
+
+    const sql = "DELETE FROM recipes WHERE id = ? AND user_id = ?";
+
+    db.query(sql, [id, req.session.user_id], (err, result) => {
+        if (err) {
+            console.error("DELETE ERROR:", err);
+            return res.status(500).send("Database error");
+        }
+
+        res.sendStatus(200);
+    });
+});
+
 app.post("/categories", (req, res) => {
     if (!req.session.user_id) {
         return res.status(401).json({ error: "Not logged in" });
