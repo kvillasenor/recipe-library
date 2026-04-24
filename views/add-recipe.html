@@ -13,7 +13,7 @@
     </div>
 
     <!-- Main Layout -->
-    <form action="/add-recipe" method="POST" enctype="multipart/form-data">
+    <form id="addForm" enctype="multipart/form-data">
 
         <div class="top-section">
             <input type="text" name="title" placeholder="Recipe Title" class="title-input" required>
@@ -71,6 +71,7 @@
             <!-- RIGHT -->
             <div class="right-panel">
                 <label>Upload Image (JPG or PNG):</label>
+                <p id="imageError" style="color:red; margin: 5px 0;"></p>
                 <input type="file" name="image">
             </div>
 
@@ -119,6 +120,33 @@
         })
         .catch(err => console.error(err));
     }
+
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+
+    if (error) {
+        document.getElementById("imageError").textContent = error;
+    }
+
+    document.getElementById("addForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        document.getElementById("imageError").textContent = ""; // clear old error
+
+        const formData = new FormData(this);
+
+        const res = await fetch("/add-recipe", {
+            method: "POST",
+            body: formData
+        });
+
+        if (res.ok) {
+            window.location.href = "/dashboard";
+        } else {
+            const errorText = await res.text();
+            document.getElementById("imageError").textContent = errorText;
+        }
+    });
 </script>
 </body>
 </html>

@@ -45,7 +45,18 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only JPG and PNG files are allowed"), false);
+        }
+    }
+});
 
 //Routes
 app.get("/", (req, res) => {
@@ -205,14 +216,12 @@ app.post("/login", async (req, res) => {
     });
 });
 
-app.post("/add-recipe", upload.single("image"), (req, res) => {
+app.post("/add-recipe", (req, res) => {
+    upload.single("image")(req, res, function (err) {
 
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-
-    if (!req.session.user_id) {
-        return res.redirect("/");
-    }
+        if (err) {
+            return res.status(400).send(err.message);
+        }
 
     const {
         title,
@@ -258,17 +267,16 @@ app.post("/add-recipe", upload.single("image"), (req, res) => {
         }
 
         res.redirect("/dashboard");
+        });
     });
 });
 
-app.post("/update-recipe/:id", upload.single("image"), (req, res) => {
+app.post("/update-recipe/:id", (req, res) => {
+    upload.single("image")(req, res, function (err) {
 
-    console.log("UPDATE BODY:", req.body);
-    console.log("UPDATE FILE:", req.file);
-
-    if (!req.session.user_id) {
-        return res.status(401).send("Not logged in");
-    }
+        if (err) {
+            return res.redirect(`/edit-recipe/${req.params.id}?error=` + encodeURIComponent(err.message));
+        }
 
     const id = req.params.id;
 
@@ -344,6 +352,7 @@ app.post("/update-recipe/:id", upload.single("image"), (req, res) => {
         }
 
         res.sendStatus(200);
+        });
     });
 });
 

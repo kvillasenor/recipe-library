@@ -71,6 +71,7 @@
         <!-- RIGHT -->
         <div class="right-panel">
             <label>Upload New Image (optional):</label>
+            <p id="imageError" style="color:red; margin: 5px 0;"></p>
             <input type="file" id="image" accept="image/png, image/jpeg">
         </div>
 
@@ -180,6 +181,13 @@ document.getElementById("editForm").addEventListener("submit", async function (e
         alert("Error updating recipe");
     }
 });
+
+const params = new URLSearchParams(window.location.search);
+const error = params.get("error");
+
+if (error) {
+    document.getElementById("imageError").textContent = error;
+}
 
 loadRecipe();
 
