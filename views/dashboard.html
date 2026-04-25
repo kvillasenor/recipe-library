@@ -43,12 +43,14 @@
 
             <!-- CONTENT AREA -->
             <div class="content-box">
+            
+            <button id="backBtn" class="back-btn" style="display:none;">← Back</button>
 
-                <h2 id="emptyMessage" class="empty-text">“No Saved Recipes Yet”</h2>
+            <h2 id="emptyMessage" class="empty-text">“No Saved Recipes Yet”</h2>
 
-                <div id="recipeGrid"></div>
+            <div id="recipeGrid"></div>
 
-            </div>
+        </div>
 
         </div>
 
@@ -63,7 +65,11 @@
         
         let allRecipes = [];
 
+        let currentView = "all"; 
+        let selectedCourse = null;
+
         const searchInput = document.getElementById("searchInput");
+        const backBtn = document.getElementById("backBtn");
 
         searchInput.addEventListener("input", function () {
             const query = this.value.toLowerCase().trim();
@@ -238,6 +244,12 @@
 
 
         function showCategories(courseName) {
+            currentView = "course";
+            selectedCourse = courseName;
+
+            backBtn.style.display = "inline-block";
+            backBtn.textContent = "← Back to Courses";
+
             const container = document.getElementById("recipeGrid");
             const emptyMessage = document.getElementById("emptyMessage");
 
@@ -273,6 +285,11 @@
         }
 
         function showRecipesByCategory(courseName, categoryName) {
+            currentView = "category";
+
+            backBtn.style.display = "inline-block";
+            backBtn.textContent = "← Back to Categories";
+
             const container = document.getElementById("recipeGrid");
             const emptyMessage = document.getElementById("emptyMessage");
 
@@ -312,6 +329,11 @@
         }
 
         function showCourses() {
+            currentView = "courses";
+            selectedCourse = null;
+
+            backBtn.style.display = "none";
+
             setActiveTab(1);
             displayCourseFolders();
         }
@@ -323,6 +345,18 @@
                 tab.classList.toggle("active", i === index);
             });
         }
+
+        backBtn.addEventListener("click", function () {
+
+        if (currentView === "category") {
+            // go back to categories inside course
+            showCategories(selectedCourse);
+        } 
+        else if (currentView === "course") {
+            // go back to course folders
+            showCourses();
+        }
+    });
 
     </script>
 
