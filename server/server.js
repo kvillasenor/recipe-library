@@ -1,52 +1,52 @@
-const express = require("express");
+require("dotenv").config();
+console.log("SUPABASE_URL =", process.env.SUPABASE_URL);
+
 const path = require("path");
-const mysql = require("mysql2");
+
+const express = require("express");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const multer = require("multer");
-const fs = require("fs");
 
+const { Pool } = require("pg");
+const { createClient } = require("@supabase/supabase-js");
 const app = express();
 
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
 //Middlware
-app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "../public")));app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: "secret-key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true
 }));
 
-//Database connection
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "F@m4life12", 
-    database: "recipe_library"
+const db = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 });
 
-db.connect((err) => {
-    if (err) {
-        console.error("Database connection failed:", err);
-    } else {
-        console.log("Connected to MySQL!");
-    }
+db.query("SELECT NOW()", (err, res) => {
+    console.log("DB TEST ERROR:", err);
+    console.log("DB TEST SUCCESS:", res?.rows);
 });
 
-//Configuring storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "public/uploads");
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
+console.log("PostgreSQL pool ready");
+
+function requireLogin(req, res, next) {
+    if (!req.session.user_id) {
+        return res.redirect("/");
     }
-});
+    next();
+}
 
 const upload = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     fileFilter: function (req, file, cb) {
         const allowedTypes = ["image/jpeg", "image/png"];
 
@@ -75,16 +75,12 @@ app.get("/add-recipe", (req, res) => {
     res.sendFile(path.join(__dirname, "../views/add-recipe.html"));
 });
 
-app.get("/recipes", (req, res) => {
-    // Make sure user is logged in
-    if (!req.session.user_id) {
-        return res.status(401).json({ error: "Not logged in" });
-    }
+app.get("/recipes", requireLogin, (req, res) => {
 
     const sql = `
         SELECT *
         FROM recipes
-        WHERE user_id = ?
+        WHERE user_id = $1
     `;
 
     db.query(sql, [req.session.user_id], (err, results) => {
@@ -93,7 +89,7 @@ app.get("/recipes", (req, res) => {
             return res.status(500).json({ error: "Database error" });
         }
 
-        res.json(results);
+        res.json(results.rows);
     });
 });
 
@@ -101,41 +97,28 @@ app.get("/recipe/:id", (req, res) => {
     res.sendFile(path.join(__dirname, "../views/recipe.html"));
 });
 
-app.get("/recipes/:id", (req, res) => {
-    if (!req.session.user_id) {
-        return res.status(401).json({ error: "Not logged in" });
-    }
+app.get("/recipes/:id", requireLogin, (req, res) => {
 
-    const sql = "SELECT * FROM recipes WHERE id = ? AND user_id = ?";
+    const sql = "SELECT * FROM recipes WHERE id = $1 AND user_id = $2";
 
     db.query(sql, [req.params.id, req.session.user_id], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Database error" });
-        }
+        if (err) return res.status(500).json({ error: "Database error" });
 
-        if (results.length === 0) {
+        if (results.rows.length === 0) {
             return res.status(404).json({ error: "Recipe not found" });
         }
 
-        res.json(results[0]);
+        res.json(results.rows[0]);
     });
 });
 
-app.get("/categories", (req, res) => {
-    if (!req.session.user_id) {
-        return res.status(401).json({ error: "Not logged in" });
-    }
-
-    const sql = "SELECT * FROM categories WHERE user_id = ?";
+app.get("/categories", requireLogin, (req, res) => {
+    const sql = "SELECT * FROM categories WHERE user_id = $1";
 
     db.query(sql, [req.session.user_id], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Database error" });
-        }
+        if (err) return res.status(500).json({ error: "Database error" });
 
-        res.json(results);
+        res.json(results.rows);
     });
 });
 
@@ -148,7 +131,7 @@ app.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
     // checks to see if username already exists
-    const checkUser = "SELECT * FROM users WHERE username = ?";
+    const checkUser = "SELECT * FROM users WHERE username = $1";
 
     db.query(checkUser, [username], async (err, results) => {
         if (err) {
@@ -157,7 +140,7 @@ app.post("/register", async (req, res) => {
         }
 
         // this is if the username exists
-        if (results.length > 0) {
+        if (results.rows.length > 0) {
             return res.redirect("/register?error=Username already exists");
         }
 
@@ -165,7 +148,7 @@ app.post("/register", async (req, res) => {
             //hashes the password
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+            const sql = "INSERT INTO users (username, password) VALUES ($1, $2)";
 
             db.query(sql, [username, hashedPassword], (err, result) => {
                 if (err) {
@@ -186,10 +169,10 @@ app.post("/register", async (req, res) => {
 
 
 //Handles login
-app.post("/login", async (req, res) => {
+app.post("/login", (req, res) => {
     const { username, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE username = ?";
+    const sql = "SELECT * FROM users WHERE username = $1";
 
     db.query(sql, [username], async (err, results) => {
         if (err) {
@@ -197,11 +180,11 @@ app.post("/login", async (req, res) => {
             return res.redirect("/?error=Server error");
         }
 
-        if (results.length == 0) {
+        if (results.rows.length == 0) {
             return res.redirect("/?error=Invalid username or password");
         }
 
-        const user = results[0];
+        const user = results.rows[0];
 
         const match = await bcrypt.compare(password, user.password);
 
@@ -216,12 +199,12 @@ app.post("/login", async (req, res) => {
     });
 });
 
-app.post("/add-recipe", (req, res) => {
-    upload.single("image")(req, res, function (err) {
-
+app.post("/add-recipe", requireLogin, (req, res) => {
+    upload.single("image")(req, res, async function (err) {
         if (err) {
             return res.status(400).send(err.message);
         }
+
 
     const {
         title,
@@ -239,7 +222,28 @@ app.post("/add-recipe", (req, res) => {
         return res.send("Missing required fields");
     }
     
-    const image = req.file ? "/uploads/" + req.file.filename : null;
+    let image = null;
+
+    if (req.file) {
+        const fileName = Date.now() + "-" + req.file.originalname;
+
+        const { error } = await supabase.storage
+            .from("recipe-images")
+            .upload(fileName, req.file.buffer, {
+                contentType: req.file.mimetype
+            });
+
+        if (error) {
+            console.error(error);
+            return res.send("Image upload failed");
+        }
+
+        const { data } = supabase.storage
+            .from("recipe-images")
+            .getPublicUrl(fileName);
+
+        image = data.publicUrl;
+    }
 
     const prep_time = `${prep_hours || 0}h ${prep_minutes || 0}m`;
     const cook_time = `${cook_hours || 0}h ${cook_minutes || 0}m`;
@@ -247,7 +251,7 @@ app.post("/add-recipe", (req, res) => {
     const sql = `
         INSERT INTO recipes 
         (user_id, title, ingredients, instructions, prep_time, cook_time, course, category, image)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
 
     db.query(sql, [
@@ -260,9 +264,9 @@ app.post("/add-recipe", (req, res) => {
         course,
         category,
         image
-    ], (err, result) => {
+    ], (err) => {
         if (err) {
-           console.log("MYSQL ERROR:", err);
+            console.log("DB ERROR:", err);
             return res.send("Error saving recipe");
         }
 
@@ -271,99 +275,123 @@ app.post("/add-recipe", (req, res) => {
     });
 });
 
-app.post("/update-recipe/:id", (req, res) => {
-    upload.single("image")(req, res, function (err) {
-
+app.post("/update-recipe/:id", requireLogin, (req, res) => {
+    upload.single("image")(req, res, async function (err) {
         if (err) {
-            return res.redirect(`/edit-recipe/${req.params.id}?error=` + encodeURIComponent(err.message));
+            return res.redirect(
+                `/edit-recipe/${req.params.id}?error=` +
+                encodeURIComponent(err.message)
+            );
         }
 
-    const id = req.params.id;
+        const id = req.params.id;
 
-    const {
-        title,
-        ingredients,
-        instructions,
-        prep_hours,
-        prep_minutes,
-        cook_hours,
-        cook_minutes,
-        course,
-        category
-    } = req.body;
-
-    const prep_time = `${prep_hours || 0}h ${prep_minutes || 0}m`;
-    const cook_time = `${cook_hours || 0}h ${cook_minutes || 0}m`;
-
-    let imagePath = null;
-
-    if (req.file) {
-        imagePath = "/uploads/" + req.file.filename;
-    }
-
-    let sql;
-    let params;
-
-    if (imagePath) {
-        sql = `
-            UPDATE recipes
-            SET title = ?, ingredients = ?, instructions = ?, 
-                prep_time = ?, cook_time = ?, course = ?, category = ?, image = ?
-            WHERE id = ? AND user_id = ?
-        `;
-
-        params = [
+        const {
             title,
             ingredients,
             instructions,
-            prep_time,
-            cook_time,
+            prep_hours,
+            prep_minutes,
+            cook_hours,
+            cook_minutes,
             course,
-            category,
-            imagePath,
-            id,
-            req.session.user_id
-        ];
-    } else {
-        sql = `
-            UPDATE recipes
-            SET title = ?, ingredients = ?, instructions = ?, 
-                prep_time = ?, cook_time = ?, course = ?, category = ?
-            WHERE id = ? AND user_id = ?
-        `;
+            category
+        } = req.body;
 
-        params = [
-            title,
-            ingredients,
-            instructions,
-            prep_time,
-            cook_time,
-            course,
-            category,
-            id,
-            req.session.user_id
-        ];
-    }
+        const prep_time = `${prep_hours || 0}h ${prep_minutes || 0}m`;
+        const cook_time = `${cook_hours || 0}h ${cook_minutes || 0}m`;
 
-    db.query(sql, params, (err) => {
-        if (err) {
-            console.error("UPDATE ERROR:", err);
-            return res.status(500).send("Database error");
+        let imagePath = null;
+
+        try {
+            if (req.file) {
+                const fileName = Date.now() + "-" + req.file.originalname;
+
+                const { error } = await supabase.storage
+                    .from("recipe-images")
+                    .upload(fileName, req.file.buffer, {
+                        contentType: req.file.mimetype
+                    });
+
+                if (error) {
+                    console.error(error);
+                    return res.status(500).send("Image upload failed");
+                }
+
+                const { data } = supabase.storage
+                    .from("recipe-images")
+                    .getPublicUrl(fileName);
+
+                imagePath = data.publicUrl;
+            }
+
+            let sql;
+            let params;
+
+            if (imagePath) {
+                sql = `
+                    UPDATE recipes
+                    SET title = $1, ingredients = $2, instructions = $3,
+                        prep_time = $4, cook_time = $5, course = $6,
+                        category = $7, image = $8
+                    WHERE id = $9 AND user_id = $10
+                `;
+
+                params = [
+                    title,
+                    ingredients,
+                    instructions,
+                    prep_time,
+                    cook_time,
+                    course,
+                    category,
+                    imagePath,
+                    id,
+                    req.session.user_id
+                ];
+            } else {
+                sql = `
+                    UPDATE recipes
+                    SET title = $1, ingredients = $2, instructions = $3,
+                        prep_time = $4, cook_time = $5, course = $6,
+                        category = $7
+                    WHERE id = $8 AND user_id = $9
+                `;
+
+                params = [
+                    title,
+                    ingredients,
+                    instructions,
+                    prep_time,
+                    cook_time,
+                    course,
+                    category,
+                    id,
+                    req.session.user_id
+                ];
+            }
+
+            db.query(sql, params, (err) => {
+                if (err) {
+                    console.error("UPDATE ERROR:", err);
+                    return res.status(500).send("Database error");
+                }
+
+                res.sendStatus(200);
+            });
+
+        } catch (error) {
+            console.error("UPDATE ROUTE ERROR:", error);
+            res.status(500).send("Server error");
         }
-
-        res.sendStatus(200);
-        });
     });
 });
 
-app.post("/delete-recipe/:id", (req, res) => {
-    if (!req.session.user_id) {
-        return res.status(401).send("Not logged in");
-    }
+app.post("/delete-recipe/:id", requireLogin, (req, res) => {
 
     const id = req.params.id;
 
-    const sql = "DELETE FROM recipes WHERE id = ? AND user_id = ?";
+    const sql = "DELETE FROM recipes WHERE id = $1 AND user_id = $2";
 
     db.query(sql, [id, req.session.user_id], (err, result) => {
         if (err) {
@@ -375,14 +403,10 @@ app.post("/delete-recipe/:id", (req, res) => {
     });
 });
 
-app.post("/categories", (req, res) => {
-    if (!req.session.user_id) {
-        return res.status(401).json({ error: "Not logged in" });
-    }
-
+app.post("/categories", requireLogin, (req, res) => {
     const { name } = req.body;
 
-    const sql = "INSERT INTO categories (name, user_id) VALUES (?, ?)";
+    const sql = "INSERT INTO categories (name, user_id) VALUES ($1, $2)";
 
     db.query(sql, [name, req.session.user_id], (err, result) => {
         if (err) {
@@ -396,4 +420,3 @@ app.post("/categories", (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
-
